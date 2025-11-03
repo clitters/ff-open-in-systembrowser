@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Open in System Browser",
+  "version": "1.0.0",
+  "description": "Open links in your system's default browser via context menu",
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "permissions": [
+    "nativeMessaging",
+    "contextMenus"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "open-in-systembrowser@clitters.github.io",
+      "strict_min_version": "57.0"
+    }
+  }
+}
