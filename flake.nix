@@ -16,7 +16,7 @@
           # Native messaging host package
           native-host = pkgs.stdenv.mkDerivation {
             pname = "ff-open-in-systembrowser-host";
-            version = "1.0.1";
+            version = "1.1.0";
 
             src = ./host;
 
@@ -52,7 +52,7 @@
           # Firefox addon package
           addon = pkgs.stdenv.mkDerivation {
             pname = "ff-open-in-systembrowser-addon";
-            version = "1.0.1";
+            version = "1.1.0";
 
             src = ./.;
 
@@ -63,6 +63,7 @@
               cd build
               cp ${./manifest.json} manifest.json
               cp ${./background.js} background.js
+              cp ${./content.js} content.js
               mkdir -p icons
               # Add placeholder icons if they don't exist
               touch icons/icon-48.png icons/icon-96.png

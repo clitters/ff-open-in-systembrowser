@@ -15,6 +15,27 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
+// Inject content script to all pages for click handling
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.url && !tab.url.startsWith('about:')) {
+    browser.tabs.executeScript(tabId, {
+      file: 'content.js',
+      allFrames: true,
+      runAt: 'document_end'
+    }).catch(err => {
+      // Ignore errors for protected pages
+      console.log('Could not inject content script:', err.message);
+    });
+  }
+});
+
+// Listen for messages from content script
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (message.action === 'openInSystemBrowser' && message.url) {
+    openInSystemBrowser(message.url);
+  }
+});
+
 // Function to send URL to native messaging host
 function openInSystemBrowser(url) {
   try {
@@ -25,6 +46,8 @@ function openInSystemBrowser(url) {
       if (response.error) {
         console.error("Native host error:", response.error);
         notifyError(response.error);
+      } else if (response.success) {
+        console.log("Successfully opened URL in system browser");
       }
     });
     
