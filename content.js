@@ -12,6 +12,7 @@ document.addEventListener('mousedown', (event) => {
     if (target && target.href) {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       
       // Send message to background script to open in system browser
       browser.runtime.sendMessage({
@@ -24,7 +25,25 @@ document.addEventListener('mousedown', (event) => {
   }
 }, true); // Use capture phase to intercept before other handlers
 
-// Also prevent default middle-click behavior when Alt is pressed
+// Also prevent mouseup event to stop link navigation
+document.addEventListener('mouseup', (event) => {
+  if (event.altKey && event.button === 1) {
+    // Check if this is on a link
+    let target = event.target;
+    while (target && target.tagName !== 'A') {
+      target = target.parentElement;
+    }
+    
+    if (target && target.href) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      return false;
+    }
+  }
+}, true);
+
+// Also prevent the click event completely
 document.addEventListener('click', (event) => {
   if (event.altKey && event.button === 1) {
     // Check if this is on a link
@@ -36,6 +55,25 @@ document.addEventListener('click', (event) => {
     if (target && target.href) {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
+      return false;
+    }
+  }
+}, true);
+
+// Also catch the auxclick event (which is fired for middle/auxiliary button clicks)
+document.addEventListener('auxclick', (event) => {
+  if (event.altKey && event.button === 1) {
+    // Check if this is on a link
+    let target = event.target;
+    while (target && target.tagName !== 'A') {
+      target = target.parentElement;
+    }
+    
+    if (target && target.href) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
       return false;
     }
   }
