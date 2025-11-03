@@ -16,7 +16,7 @@
           # Native messaging host package
           native-host = pkgs.stdenv.mkDerivation {
             pname = "ff-open-in-systembrowser-host";
-            version = "1.1.0";
+            version = "1.1.1";
 
             src = ./host;
 
@@ -52,7 +52,7 @@
           # Firefox addon package
           addon = pkgs.stdenv.mkDerivation {
             pname = "ff-open-in-systembrowser-addon";
-            version = "1.1.0";
+            version = "1.1.1";
 
             src = ./.;
 

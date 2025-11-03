@@ -1,7 +1,7 @@
-// Handle Alt+Right-Click on links
+// Handle Alt+Middle-Click on links
 document.addEventListener('mousedown', (event) => {
-  // Check for Alt key + Right mouse button (button 2)
-  if (event.altKey && event.button === 2) {
+  // Check for Alt key + Middle mouse button (button 1)
+  if (event.altKey && event.button === 1) {
     // Find the closest link element
     let target = event.target;
     while (target && target.tagName !== 'A') {
@@ -24,9 +24,9 @@ document.addEventListener('mousedown', (event) => {
   }
 }, true); // Use capture phase to intercept before other handlers
 
-// Also prevent context menu from showing when Alt+Right-Click is used
-document.addEventListener('contextmenu', (event) => {
-  if (event.altKey) {
+// Also prevent default middle-click behavior when Alt is pressed
+document.addEventListener('click', (event) => {
+  if (event.altKey && event.button === 1) {
     // Check if this is on a link
     let target = event.target;
     while (target && target.tagName !== 'A') {
