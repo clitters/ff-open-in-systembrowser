@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+SCRIPT_DIR="$(cd ""<<|endoftext|>---_V0|endoftext|>---ABILITY 2|endoftext|>---V0|endoftext|>---V0|endoftext|>---INDIVIDUAL 2|endoftext|>---CONTEXT 2|endoftext|>---V0|endoftext|>---V0|endoftext|>---V0|endoftext|>---V0|endoftext|>---V0|endoftext|>---V0|endoftext|>---V0|endoftext|>---V0|endoftext|>---V0|endoftext|>---INDIVIDUAL 2|endoftext|>---INDIVIDUAL 2|endoftext|>---INDIVIDUAL 2|endoftext|>---STRATEGY 1|endoftext|>---STRATEGY 1|endoftext|>---INDIVIDUAL 2|endoftext|>---INDIVIDUAL 2|endoftext|>---INDIVIDUAL 2|endoftext|>---V0|endoftext|>---V0|endoftext|>--080cf-pmF5138OXB3xc9SE4eOSBRpGQcvsc4YZR8Akm ==
