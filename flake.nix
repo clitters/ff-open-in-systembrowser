@@ -75,6 +75,12 @@
               cp ff-open-in-systembrowser.xpi $out/
             '';
 
+            # Add passthru for NUR/Waterfox compatibility
+            passthru = {
+              addonId = "open-in-systembrowser@clitters.github.io";
+              xpiPath = "$out/ff-open-in-systembrowser.xpi";
+            };
+
             meta = with pkgs.lib; {
               description = "Firefox addon to open links in system browser";
               license = licenses.mit;
