@@ -1,0 +1,9 @@
+{
+  "name": "open_in_systembrowser",
+  "description": "Open URLs in system default browser",
+  "path": "HOST_PATH",
+  "type": "stdio",
+  "allowed_extensions": [
+    "open-in-systembrowser@clitters.github.io"
+  ]
+}
