@@ -93,6 +93,8 @@ cd host
 }
 ```
 
+**Note:** The Nix installation installs both the native host and the extension directly from this GitHub repository (not from AMO). Updates are managed through your Nix configuration.
+
 ### Extension Installation
 
 **After installing the native host**, install the Firefox extension:
