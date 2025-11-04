@@ -1,0 +1,143 @@
+name: Build and Release Firefox Addon
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Lint extension
+      run: npm run lint
+      continue-on-error: true
+    
+    - name: Check for icons
+      run: |
+        if [ ! -f "src/icons/icon-48.png" ] || [ ! -f "src/icons/icon-96.png" ]; then
+          echo "::warning::Icon files not found. Please add icon-48.png and icon-96.png to src/icons/"
+          # Create placeholder icons for build (1x1 transparent PNG)
+          mkdir -p src/icons
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" | base64 -d > src/icons/icon-48.png
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" | base64 -d > src/icons/icon-96.png
+        fi
+    
+    - name: Build extension
+      run: npm run build
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: firefox-addon-unsigned
+        path: dist/*.xpi
+        if-no-files-found: error
+    
+    - name: Get version from manifest
+      id: version
+      run: echo "version=$(grep -oP '\"version\":\s*\"\K[^\"]+' src/manifest.json)" >> $GITHUB_OUTPUT
+
+  sign:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: firefox-addon-unsigned
+        path: dist/
+    
+    - name: Sign extension
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      env:
+        WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+        WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+      run: |
+        if [ -z "$WEB_EXT_API_KEY" ] || [ -z "$WEB_EXT_API_SECRET" ]; then
+          echo "::warning::WEB_EXT_API_KEY or WEB_EXT_API_SECRET not set. Skipping signing."
+          echo "To enable signing, add these secrets to your repository."
+          exit 0
+        fi
+        npm run sign
+    
+    - name: Upload signed artifact
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      uses: actions/upload-artifact@v4
+      with:
+        name: firefox-addon-signed
+        path: dist/*.xpi
+        if-no-files-found: warn
+
+  release:
+    needs: sign
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download signed artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: firefox-addon-signed
+        path: dist/
+      continue-on-error: true
+    
+    - name: Download unsigned artifact (fallback)
+      if: failure()
+      uses: actions/download-artifact@v4
+      with:
+        name: firefox-addon-unsigned
+        path: dist/
+    
+    - name: Get version
+      id: version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*.xpi
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        fail_on_unmatched_files: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

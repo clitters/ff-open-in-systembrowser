@@ -2,8 +2,13 @@
 *.xpi
 build/
 dist/
+web-ext-artifacts/
 result
 result-*
+
+# NPM
+node_modules/
+package-lock.json
 
 # Nix
 .direnv/

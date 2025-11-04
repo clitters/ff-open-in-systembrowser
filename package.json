@@ -1,0 +1,32 @@
+{
+  "name": "ff-open-in-systembrowser",
+  "version": "1.1.2",
+  "description": "Firefox addon to open links in system browser using native messaging host",
+  "private": true,
+  "scripts": {
+    "build": "web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest",
+    "sign": "web-ext sign --source-dir=src --artifacts-dir=dist --channel=unlisted",
+    "lint": "web-ext lint --source-dir=src",
+    "package": "bash scripts/package.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clitters/ff-open-in-systembrowser.git"
+  },
+  "keywords": [
+    "firefox",
+    "addon",
+    "extension",
+    "browser",
+    "native-messaging"
+  ],
+  "author": "clitters",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/clitters/ff-open-in-systembrowser/issues"
+  },
+  "homepage": "https://github.com/clitters/ff-open-in-systembrowser#readme",
+  "devDependencies": {
+    "web-ext": "^8.3.0"
+  }
+}

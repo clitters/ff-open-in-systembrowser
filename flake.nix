@@ -60,13 +60,18 @@
 
             buildPhase = ''
               mkdir -p build
-              cd build
-              cp ${./manifest.json} manifest.json
-              cp ${./background.js} background.js
-              cp ${./content.js} content.js
-              mkdir -p icons
-              # Add placeholder icons if they don't exist
-              touch icons/icon-48.png icons/icon-96.png
+              cd src
+              cp manifest.json ../build/
+              cp background.js ../build/
+              cp content.js ../build/
+              if [ -d icons ]; then
+                cp -r icons ../build/
+              else
+                mkdir -p ../build/icons
+                # Create minimal placeholder icons if they don't exist
+                touch ../build/icons/icon-48.png ../build/icons/icon-96.png
+              fi
+              cd ../build
               zip -r ../ff-open-in-systembrowser.xpi .
               cd ..
             '';
