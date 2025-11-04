@@ -2,6 +2,8 @@
 
 Firefox addon to open a link in system browser using native messaging host
 
+⚠️ **IMPORTANT: This extension requires a native messaging host to be installed on your system.** The extension alone will not work without the companion native host. See [Native Messaging Host Installation](#native-messaging-host-installation) below.
+
 ## Features
 
 - Open links in your system's default browser via context menu
@@ -10,7 +12,90 @@ Firefox addon to open a link in system browser using native messaging host
 
 ## Installation
 
+**Installation Order:**
+1. Install the Native Messaging Host first (required)
+2. Then install the Firefox Extension
+
+### Native Messaging Host Installation
+
+The extension requires a native messaging host to communicate with your system. **Install this first.**
+
+#### Using the Install Script
+```bash
+cd host
+./install.sh
+```
+
+#### Manual Installation
+
+1. **Copy the Python script to a permanent location:**
+   ```bash
+   sudo mkdir -p /usr/local/bin
+   sudo cp host/open_in_systembrowser.py /usr/local/bin/
+   sudo chmod +x /usr/local/bin/open_in_systembrowser.py
+   ```
+
+2. **Create the native messaging host manifest:**
+   
+   **On Linux:**
+   ```bash
+   mkdir -p ~/.mozilla/native-messaging-hosts
+   cat > ~/.mozilla/native-messaging-hosts/open_in_systembrowser.json << 'EOF'
+   {
+     "name": "open_in_systembrowser",
+     "description": "Open URLs in system default browser",
+     "path": "/usr/local/bin/open_in_systembrowser.py",
+     "type": "stdio",
+     "allowed_extensions": [
+       "open-in-systembrowser@clitters.github.io"
+     ]
+   }
+   EOF
+   ```
+   
+   **On macOS:**
+   ```bash
+   mkdir -p ~/Library/Application\ Support/Mozilla/NativeMessagingHosts
+   cat > ~/Library/Application\ Support/Mozilla/NativeMessagingHosts/open_in_systembrowser.json << 'EOF'
+   {
+     "name": "open_in_systembrowser",
+     "description": "Open URLs in system default browser",
+     "path": "/usr/local/bin/open_in_systembrowser.py",
+     "type": "stdio",
+     "allowed_extensions": [
+       "open-in-systembrowser@clitters.github.io"
+     ]
+   }
+   EOF
+   ```
+
+3. **Verify the installation:**
+   ```bash
+   # Check the manifest exists
+   cat ~/.mozilla/native-messaging-hosts/open_in_systembrowser.json  # Linux
+   # or
+   cat ~/Library/Application\ Support/Mozilla/NativeMessagingHosts/open_in_systembrowser.json  # macOS
+   
+   # Check the script is executable
+   ls -la /usr/local/bin/open_in_systembrowser.py
+   ```
+
+#### Using Nix
+```nix
+# In your NixOS configuration or home-manager
+{
+  imports = [ (builtins.fetchGit {
+    url = "https://github.com/clitters/ff-open-in-systembrowser";
+    ref = "main";
+  }).nixosModules.default ];
+  
+  programs.firefox-open-in-system-browser.enable = true;
+}
+```
+
 ### Extension Installation
+
+**After installing the native host**, install the Firefox extension:
 
 #### Option 1: Firefox Add-ons (AMO) - Recommended
 **Automatic updates enabled**
@@ -34,6 +119,16 @@ npm install
 npm run build
 # The .xpi file will be in the dist/ directory
 ```
+
+### Troubleshooting
+
+If the extension doesn't work:
+1. **Check native host is installed**: Look for `open_in_systembrowser.json` in:
+   - Linux: `~/.mozilla/native-messaging-hosts/`
+   - macOS: `~/Library/Application Support/Mozilla/NativeMessagingHosts/`
+2. **Check the host script is executable**: `chmod +x /path/to/open_in_systembrowser.py`
+3. **Check Firefox console**: Open Browser Console (Ctrl+Shift+J) to see error messages
+4. **Test the host manually**: Run the Python script directly to verify it works
 
 ### Native Messaging Host Installation
 
