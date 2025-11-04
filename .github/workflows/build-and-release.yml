@@ -43,13 +43,16 @@ jobs:
     - name: Build extension
       run: npm run build
     
-    - name: Rename .zip to .xpi
+    - name: Rename and prepare artifacts
       run: |
         cd dist
+        VERSION=$(grep -oP '"version":\s*"\K[^"]+' ../src/manifest.json)
+        
+        # Rename .zip to .xpi with proper naming
         for file in *.zip; do
           if [ -f "$file" ]; then
-            mv "$file" "${file%.zip}.xpi"
-            echo "Renamed $file to ${file%.zip}.xpi"
+            mv "$file" "open_in_system_browser-${VERSION}-unsigned.xpi"
+            echo "Created: open_in_system_browser-${VERSION}-unsigned.xpi"
           fi
         done
         ls -lh
@@ -102,12 +105,27 @@ jobs:
         fi
         npm run sign
     
+    - name: Rename signed artifacts
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      run: |
+        cd dist
+        VERSION=$(grep -oP '"version":\s*"\K[^"]+' ../src/manifest.json)
+        
+        # The signed XPI will have a hash in the name, rename it properly
+        for file in *.xpi; do
+          if [ -f "$file" ] && [[ "$file" != *"unsigned"* ]]; then
+            mv "$file" "open_in_system_browser-${VERSION}-signed.xpi"
+            echo "Created: open_in_system_browser-${VERSION}-signed.xpi"
+          fi
+        done
+        ls -lh
+    
     - name: Upload signed artifact
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
       uses: actions/upload-artifact@v4
       with:
         name: firefox-addon-signed
-        path: dist/*.xpi
+        path: dist/*-signed.xpi
         if-no-files-found: warn
 
   release:

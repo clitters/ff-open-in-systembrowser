@@ -12,13 +12,23 @@ Firefox addon to open a link in system browser using native messaging host
 
 ### Extension Installation
 
-#### From Release (Recommended)
-1. Download the latest `.xpi` file from the [Releases](https://github.com/clitters/ff-open-in-systembrowser/releases) page
+#### Option 1: Firefox Add-ons (AMO) - Recommended
+**Automatic updates enabled**
+- Visit [Firefox Add-ons page](https://addons.mozilla.org/) (link TBD - upload your signed XPI)
+- Click "Add to Firefox"
+- Automatic updates will be handled by Mozilla
+
+#### Option 2: Direct Installation from GitHub
+**Manual updates only**
+1. Download the latest signed XPI from the [Releases](https://github.com/clitters/ff-open-in-systembrowser/releases) page
+   - Look for `open_in_system_browser-X.X.X-signed.xpi`
 2. Open Firefox and navigate to `about:addons`
 3. Click the gear icon and select "Install Add-on From File..."
 4. Select the downloaded `.xpi` file
 
-#### From Source
+**Note:** Direct installations from GitHub won't receive automatic updates. Check the releases page periodically for new versions.
+
+#### From Source (Development)
 ```bash
 npm install
 npm run build
@@ -87,12 +97,21 @@ This repository includes automated workflows for building and releasing:
 
 ### Automatic Builds
 - Builds run on every push to `main` and on pull requests
-- Artifacts are uploaded for each build
+- Unsigned XPI artifacts are uploaded with format: `open_in_system_browser-X.X.X-unsigned.xpi`
 
 ### Signing and Releases
 - Signing happens automatically when you push a tag like `v1.1.3`
+- Signed XPI is created with format: `open_in_system_browser-X.X.X-signed.xpi`
 - Requires `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET` secrets to be set in repository settings
 - Get your API credentials from [Firefox Add-ons Developer Hub](https://addons.mozilla.org/developers/addon/api/key/)
+
+### Distribution Strategy
+1. **GitHub Releases**: Both unsigned and signed XPIs are attached to releases
+2. **AMO (Mozilla Add-ons)**: Upload the signed XPI manually to AMO for users who want automatic updates
+   - Go to https://addons.mozilla.org/developers/
+   - Upload the signed XPI from your GitHub release
+   - AMO users will receive automatic updates
+   - GitHub direct install users need to manually check for updates
 
 ### Creating a Release
 ```bash
